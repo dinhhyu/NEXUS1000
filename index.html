@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEXUS 1000 | Second Brain</title>
+    <link rel="stylesheet" href="style.css?v=3">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';</script>
+</head>
+<body>
+    <div class="app-container">
+        <header>
+            <div class="logo">NEXUS<span>1000</span></div>
+            <div class="nav-tabs">
+                <button id="tab-vault" class="tab-btn active">VAULT (1000 Days)</button>
+                <button id="tab-discovery" class="tab-btn">DISCOVERY</button>
+            </div>
+            <div class="stats">
+                <span class="stat-item">Reports: <strong id="count-reports">0</strong>/1000</span>
+            </div>
+        </header>
+
+        <main id="view-vault" class="view-section active">
+            <section class="input-section">
+                <div class="flex-between">
+                    <h2>THE INPUT FORGE</h2>
+                    <button id="btn-open-modal" class="btn-primary">+ Log New Report</button>
+                </div>
+            </section>
+
+            <section class="grid-section">
+                <h2>1000-DAY MATRIX</h2>
+                <div id="matrix-grid" class="matrix-grid"></div>
+                <div class="legend">
+                    <span class="legend-item"><div class="box empty"></div> Pending</span>
+                    <span class="legend-item"><div class="box done"></div> Done</span>
+                </div>
+            </section>
+        </main>
+
+        <main id="view-discovery" class="view-section hidden">
+            <section class="search-section">
+                <h2>THƯ VIỆN ĐỊNH HƯỚNG</h2>
+                <p class="desc">Nhập chủ đề bạn muốn nghiên cứu. AI sẽ gợi ý các báo cáo/luận văn uy tín nhất.</p>
+                <div class="search-box">
+                    <input type="text" id="topic-search" placeholder="Ví dụ: Tương lai của AI trong y tế...">
+                    <button id="btn-ai-search" class="btn-magic">🔍 Tìm kiếm Báo cáo</button>
+                </div>
+                <div id="search-results" class="results-container hidden"></div>
+            </section>
+        </main>
+    </div>
+
+    <div id="input-modal" class="modal hidden">
+        <div class="modal-content modal-fullscreen">
+            <button id="btn-close-modal" class="btn-close">&times;</button>
+            
+            <div class="studio-layout">
+                <div class="studio-col pdf-col">
+                    <div class="col-header">📄 TÀI LIỆU GỐC</div>
+                    <div class="pdf-upload-box">
+                        <input type="file" id="pdf-file" accept="application/pdf">
+                    </div>
+                    <iframe id="pdf-viewer" class="pdf-viewer hidden"></iframe>
+                </div>
+
+                <div class="studio-col form-col">
+                    <div class="col-header">✍️ KHO GHI CHÚ</div>
+                    <form id="report-form" autocomplete="off">
+                        <div class="form-group">
+                            <label>Tiêu đề / Tác giả</label>
+                            <input type="text" id="report-title" required placeholder="Nhập tên tài liệu...">
+                        </div>
+                        <div class="form-group">
+                            <label>Chủ đề</label>
+                            <select id="report-topic" required>
+                                <option value="">-- Chọn --</option>
+                                <option value="AI & Tech">AI & Tech</option>
+                                <option value="Business Strategy">Business Strategy</option>
+                                <option value="Psychology">Psychology</option>
+                                <option value="Economics">Economics</option>
+                            </select>
+                        </div>
+                        
+                        <label class="section-label">TÓM TẮT CỐT LÕI (TAKEAWAYS)</label>
+                        <div class="form-group"><input type="text" id="tk-1" placeholder="1."></div>
+                        <div class="form-group"><input type="text" id="tk-2" placeholder="2."></div>
+                        <div class="form-group"><input type="text" id="tk-3" placeholder="3."></div>
+                        
+                        <label class="section-label">GHI CHÚ TỰ DO (NOTES)</label>
+                        <div class="form-group">
+                            <textarea id="general-notes" rows="4" placeholder="Nháp ý tưởng, copy/paste đoạn văn hay vào đây..."></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="section-label">AHA! MOMENT</label>
+                            <textarea id="aha-moment" required rows="2" placeholder="Insight đắt giá nhất?"></textarea>
+                        </div>
+
+                        <button type="submit" id="btn-submit" class="btn-primary btn-full">💾 LƯU VÀO VAULT</button>
+                    </form>
+                </div>
+
+                <div class="studio-col chat-col">
+                    <div class="col-header">🤖 TRỢ LÝ GEMINI</div>
+                    <div class="chat-instruction">
+                        Mẹo: Copy tiếng Anh từ PDF dán vào đây và gõ "Dịch đoạn này", hoặc hỏi "Giải thích cho tôi khái niệm X".
+                    </div>
+                    
+                    <div id="chat-history" class="chat-history">
+                        <div class="chat-msg ai-msg">Chào bạn! Hãy tải PDF lên, mình đã sẵn sàng đọc và dịch cho bạn.</div>
+                    </div>
+                    
+                    <div class="chat-input-area">
+                        <textarea id="chat-input" rows="2" placeholder="Hỏi AI hoặc nhờ dịch thuật..."></textarea>
+                        <button id="btn-chat-send" class="btn-magic">Gửi</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="script.js"></script>
+</body>
+</html>
