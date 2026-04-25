@@ -140,18 +140,16 @@ document.getElementById('report-form').addEventListener('submit', async (e) => {
 // =====================================================================
 // AI CHATBOT (DÙNG 2.5 FLASH)
 // =====================================================================
-const chatHistory = document.getElementById('chat-history');
-const chatInput = document.getElementById('chat-input');
-const btnChatSend = document.getElementById('btn-chat-send');
-
 async function sendChatMessage() {
     const userText = chatInput.value.trim();
     if (!userText) return;
 
+    // In tin nhắn của User
     chatHistory.innerHTML += `<div class="chat-msg user-msg">${userText}</div>`;
     chatInput.value = "";
     chatHistory.scrollTop = chatHistory.scrollHeight; 
 
+    // In trạng thái chờ
     const loadingId = "msg-" + Date.now();
     chatHistory.innerHTML += `<div id="${loadingId}" class="chat-msg ai-msg">⏳ Đang suy nghĩ...</div>`;
     chatHistory.scrollTop = chatHistory.scrollHeight;
@@ -171,12 +169,28 @@ async function sendChatMessage() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
         });
+        
         const data = await response.json();
+        
+        // --- BỘ BẮT LỖI CHI TIẾT ---
+        if (!response.ok) {
+            console.error("Lỗi từ Google API:", data);
+            throw new Error(`Google từ chối: ${data.error?.message || "Lỗi không xác định"}`);
+        }
+        if (!data.candidates || data.candidates.length === 0) {
+            throw new Error("Google AI chặn vì nội dung PDF nhạy cảm/vi phạm chính sách.");
+        }
+        
+        // In kết quả nếu thành công
         const aiText = data.candidates[0].content.parts[0].text;
         
-        document.getElementById(loadingId).innerText = aiText;
+        // Chuyển dấu \n của AI thành thẻ <br> để xuống dòng đẹp hơn trong khung chat
+        document.getElementById(loadingId).innerHTML = aiText.replace(/\n/g, '<br>');
+        
     } catch (e) {
-        document.getElementById(loadingId).innerText = "❌ Lỗi mạng hoặc quá tải API.";
+        console.error("Chi tiết lỗi:", e);
+        // In thẳng lỗi ra màn hình chat
+        document.getElementById(loadingId).innerHTML = `<b>❌ LỖI:</b> ${e.message}`;
     }
 }
 
